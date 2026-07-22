@@ -23,7 +23,7 @@ struct AtomicFPOp<double> {
   }
 };
 
-#if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ < 600 || CUDA_VERSION < 8000)
+#if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ < 600) && (CUDA_VERSION < 8000)
 
 static inline __device__ long long dummy(double val, unsigned long long int assumed) {
 	return __double_as_longlong(val + __longlong_as_double(assumed));

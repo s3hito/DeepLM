@@ -13,7 +13,7 @@ SET(OPENMP_LIB OpenMP::OpenMP_CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pthread -fPIC")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -29,7 +29,7 @@ execute_process (
 
 string(STRIP ${TORCH_PATH} TORCH_PATH)
 message("${TORCH_PATH}")
-add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
 include_directories(3rd/eigen)
 include_directories(${TORCH_PATH}/include)
@@ -63,8 +63,10 @@ if(WITH_CUDA)
 target_link_libraries(
     LMCore
     LMCoreKernel
+    BACore
     pybind11::module
     torch
+    torch_python
     ${OPENMP_LIB}
 )
 set_target_properties(LMCore PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"

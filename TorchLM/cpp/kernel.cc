@@ -21,17 +21,17 @@ void JacobiRightMultiply(
 	int numVar = jacobians.size();
 	int numDimJ = jacobians[0].size(0);
 
-	auto dResidual = static_cast<T*>(residual.storage().data());
+	auto dResidual = residual.data_ptr<T>();
 	memset(dResidual, 0, sizeof(T) * numResiduals * numDimJ);
 
 	for (int i = 0; i < numVar; ++i) {
 		int indicesDim = indices[i].size(1);
-		long* dIndices = static_cast<long*>(indices[i].storage().data());
+		long* dIndices = indices[i].data_ptr<long>();
 		auto& J = jacobians[i];
 		auto& P = p[i];
 		int numDimP = P.size(1);
-		auto dP = static_cast<T*>(P.storage().data());
-		auto dJ = static_cast<T*>(J.storage().data());
+		auto dP = P.data_ptr<T>();
+		auto dJ = J.data_ptr<T>();
 
 #pragma omp parallel for
 		for (int j = 0; j < numResiduals; ++j) {
@@ -69,21 +69,21 @@ void JacobiLeftMultiply(
 	int numVar = jacobians.size();
 	int numDimJ = jacobians[0].size(0);
 
-	auto dResidual = static_cast<T*>(residual.storage().data());
+	auto dResidual = residual.data_ptr<T>();
 #pragma omp parallel for
 	for (int i = 0; i < numVar; ++i) {
 		int indicesDim = indices[i].size(1);
 		auto& jtr = jtrs[i];
 		auto& J = jacobians[i];
-		long* dIndices = static_cast<long*>(indices[i].storage().data());
+		long* dIndices = indices[i].data_ptr<long>();
 
 		int numDimV = jtr.size(0);
 		int numDimP = jtr.size(1);
 
-		auto dJ = static_cast<T*>(J.storage().data());
-		auto dJtr = static_cast<T*>(jtr.storage().data());
+		auto dJ = J.data_ptr<T>();
+		auto dJtr = jtr.data_ptr<T>();
 
-		//auto dEndIdx = static_cast<long*>(endIdx[i].storage().data());
+		//auto dEndIdx = endIdx[i].data_ptr<long>();
 		//auto dIndicesIdx = static_cast<long*>(
 		//	indicesIdx[i].storage().data());
 
@@ -137,9 +137,9 @@ void SquareDot(
 #endif
 	for (int i = 0; i < numVar; ++i) {
 		auto& jtr = jtrs[i];
-		auto dJtr = static_cast<T*>(jtr.storage().data());
-		auto dD = static_cast<T*>(diagonal[i].storage().data());
-		auto dP = static_cast<T*>(p[i].storage().data());
+		auto dJtr = jtr.data_ptr<T>();
+		auto dD = diagonal[i].data_ptr<T>();
+		auto dP = p[i].data_ptr<T>();
 
 		int numDimV = jtr.size(0);
 		int numDimP = jtr.size(1);
@@ -169,13 +169,13 @@ void JacobiBlockJtJ(
 #pragma omp parallel for
 	for (int i = 0; i < numVar; ++i) {
 		int indicesDim = indices[i].size(1);
-		long* dIndices = static_cast<long*>(indices[i].storage().data());
+		long* dIndices = indices[i].data_ptr<long>();
 		auto& J = jacobians[i];
 		//auto& D = diagonal[i];
-		auto dJ = static_cast<T*>(J.storage().data());
-		auto dD = static_cast<T*>(diagonal[i].storage().data());
+		auto dJ = J.data_ptr<T>();
+		auto dD = diagonal[i].data_ptr<T>();
 
-		auto dJtJ = static_cast<T*>(jtjs[i].storage().data());
+		auto dJtJ = jtjs[i].data_ptr<T>();
 
 		int numDimJ = J.size(0);
 		int numResiduals = J.size(1);
@@ -225,9 +225,9 @@ void ListRightMultiply(
 		int numBlocks = A[i].size(0);
 		int numDim = A[i].size(1);
 
-		auto dA = static_cast<T*>(A[i].storage().data());
-		auto dX = static_cast<T*>(X[i].storage().data());
-		auto dB = static_cast<T*>(B[i].storage().data());
+		auto dA = A[i].data_ptr<T>();
+		auto dX = X[i].data_ptr<T>();
+		auto dB = B[i].data_ptr<T>();
 
 		memset(dB, 0, sizeof(T) * numDim * numBlocks);
 #pragma omp parallel for
@@ -261,9 +261,9 @@ void JacobiColumnSquare(const std::vector<torch::Tensor>& indices,
 	for (int i = 0; i < jacobians.size(); ++i) {
 		//printf("i %d\n", i);
 		int indicesDim = indices[i].size(1);
-		auto dIndices = static_cast<long*>(indices[i].storage().data());
-		auto dColumnNorm = static_cast<T*>(jacobianScale[i].storage().data());
-		auto dJacobian = static_cast<T*>(jacobians[i].storage().data());
+		auto dIndices = indices[i].data_ptr<long>();
+		auto dColumnNorm = jacobianScale[i].data_ptr<T>();
+		auto dJacobian = jacobians[i].data_ptr<T>();
 
 		int numDimJ = jacobians[i].size(0);
 		int numDimP = jacobianScale[i].size(1);
@@ -299,7 +299,7 @@ void ColumnInverseSquare(std::vector<torch::Tensor>& jacobianScale)
 		return;
 	}
 	for (int i = 0; i < jacobianScale.size(); ++i) {
-		auto dColumnNorm = static_cast<T*>(jacobianScale[i].storage().data());
+		auto dColumnNorm = jacobianScale[i].data_ptr<T>();
 		int numDimV = jacobianScale[i].size(0);
 		int numDimP = jacobianScale[i].size(1);
 		int num = numDimV * numDimP;
@@ -326,9 +326,9 @@ void JacobiNormalize(const std::vector<torch::Tensor>& indices,
 
 	for (int i = 0; i < jacobianScale.size(); ++i) {
 		int indicesDim = indices[i].size(1);
-		auto dIndices = static_cast<long*>(indices[i].storage().data());
-		auto dColumnNorm = static_cast<T*>(jacobianScale[i].storage().data());
-		auto dJacobian = static_cast<T*>(jacobians[i].storage().data());
+		auto dIndices = indices[i].data_ptr<long>();
+		auto dColumnNorm = jacobianScale[i].data_ptr<T>();
+		auto dJacobian = jacobians[i].data_ptr<T>();
 		int numDimJ = jacobians[i].size(0);
 		int numDimV = jacobianScale[i].size(0);
 		int numDimP = jacobianScale[i].size(1);
@@ -409,7 +409,7 @@ void JacobiLeftMultiplyCuda(
 		int numDimP = jtr.size(1);
 		int numP = buffer.size(1);
 
-		T* dJ = J.data_ptr<T>();//static_cast<T*>(J.storage().data());
+		T* dJ = J.data_ptr<T>();//J.data_ptr<T>();
 
 		//auto dEndIdx = endIdx[i].data_ptr<long>();
 		//auto dIndicesIdx = indicesIdx[i].data_ptr<long>();
@@ -643,7 +643,7 @@ std::vector<torch::Tensor> AnalyzeReducedIndices(const torch::Tensor& I)
 	auto intOptions = torch::TensorOptions().dtype(torch::kInt64);
 
 	auto compactIndices = torch::full({num}, 0, intOptions);
-	auto dCompactIndices = static_cast<long*>(compactIndices.storage().data());
+	auto dCompactIndices = compactIndices.data_ptr<long>();
 
 	int c = 0;	
 	for (int i = 0; i < num; ++i) {
@@ -654,7 +654,7 @@ std::vector<torch::Tensor> AnalyzeReducedIndices(const torch::Tensor& I)
 	}
 
 	auto reducedIndex = torch::full({c, 3}, 0, intOptions);
-	auto dReducedIndex = static_cast<long*>(reducedIndex.storage().data());
+	auto dReducedIndex = reducedIndex.data_ptr<long>();
 	c = 0;	
 	for (int i = 0; i < num; ++i) {
 		if (i == num - 1 || !(s[i] == s[i + 1])) {
