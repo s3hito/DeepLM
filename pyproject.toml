@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools >= 61.0",
+            "scikit-build-core >= 0.5.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "DeepLM"
+version = "0.1.0"
+description = "DeepLM for OnePose"
+
+[tool.scikit-build]
+build-dir = "build"
+build.targets = ["LMCore", "BACore"]
+[tool.scikit-build.cmake.define]
+WITH_CUDA = "1"

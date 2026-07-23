@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.15)
 project(TorchBA LANGUAGES CXX)
 find_package(OpenMP REQUIRED)
 
@@ -35,7 +35,7 @@ include_directories(3rd/eigen)
 include_directories(${TORCH_PATH}/include)
 link_directories(${TORCH_PATH}/lib)
 include_directories(${TORCH_PATH}/include/torch/csrc/api/include)
-
+set(PYBIND11_FINDPYTHON ON)
 add_subdirectory("3rd/pybind11")
 
 if(WITH_CUDA)
@@ -47,7 +47,14 @@ add_library(
 
 target_link_libraries(
     LMCoreKernel
-    torch    
+    torch
+)
+install(TARGETS LMCoreKernel
+        LIBRARY DESTINATION ${SKBUILD_PLATLIB_DIR})
+
+set_target_properties(LMCoreKernel PROPERTIES
+    INSTALL_RPATH "${TORCH_PATH}/lib"
+    BUILD_RPATH "${TORCH_PATH}/lib"
 )
 endif(WITH_CUDA)
 
@@ -78,6 +85,7 @@ target_link_libraries(
     LMCore
     pybind11::module
     torch
+    torch_python
     ${OPENMP_LIB}
 )
 set_target_properties(LMCore PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
@@ -99,8 +107,25 @@ target_link_libraries(
     BACore
     pybind11::module
     torch
+    torch_python
     ${OPENMP_LIB}
 )
 
 set_target_properties(BACore PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                           SUFFIX "${PYTHON_MODULE_EXTENSION}")
+install(TARGETS BACore
+        LIBRARY DESTINATION ${SKBUILD_PLATLIB_DIR})
+
+install(TARGETS LMCore
+        LIBRARY DESTINATION ${SKBUILD_PLATLIB_DIR})
+
+
+set_target_properties(BACore PROPERTIES
+    INSTALL_RPATH "${TORCH_PATH}/lib"
+    BUILD_RPATH "${TORCH_PATH}/lib"
+)
+
+set_target_properties(LMCore PROPERTIES
+    INSTALL_RPATH "$ORIGIN:${TORCH_PATH}/lib"
+    BUILD_RPATH "${TORCH_PATH}/lib"
+)
