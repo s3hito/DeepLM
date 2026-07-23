@@ -10,9 +10,13 @@ Please install the following
 1. [**pytorch**](https://pytorch.org).
 2. OpenMP (optional)
 
-Then, run the example via
+Then, install with:
 ```
 pip install -e . --no-build-isolation
+```
+And run tests with:
+```
+sh examples.sh
 ```
 
 ### Data Description
