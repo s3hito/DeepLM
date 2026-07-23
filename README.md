@@ -12,7 +12,7 @@ Please install the following
 
 Then, run the example via
 ```
-sh example.sh
+pip install -e . --no-build-isolation
 ```
 
 ### Data Description
