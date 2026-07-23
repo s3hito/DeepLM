@@ -4,7 +4,7 @@ import sys
 import torch
 import BACore
 import numpy as np
-
+print(os.getcwd())
 from BAProblem.rotation import AngleAxisRotatePoint
 from BAProblem.loss import SnavelyReprojectionError
 from BAProblem.io import LoadBALFromFile

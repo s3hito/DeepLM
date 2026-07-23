@@ -1,13 +1,3 @@
-#download submodule
-git submodule update --init --recursive
-
-#compile
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=ON
-make -j8
-export PYTHONPATH=$PYTHONPATH:$(pwd)
-cd ..
 
 #prepare data
 mkdir data
@@ -17,4 +7,4 @@ bzip2 -d problem-49-7776-pre.txt.bz2
 cd ..
 
 #global lm solver
-TORCH_USE_RTLD_GLOBAL=YES python3 examples/BundleAdjuster/bundle_adjuster.py --balFile ./data/problem-49-7776-pre.txt --device cuda
+TORCH_USE_RTLD_GLOBAL=YES python3 -m examples.BundleAdjuster.bundle_adjuster --balFile ./data/problem-49-7776-pre.txt --device cuda
